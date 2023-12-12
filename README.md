@@ -3,7 +3,7 @@ This guide is made to ease the process of setting an automation script of archiv
 
 # Disclaimer and credits
 This guide heavily depends and almost copies [series of articles](https://dev.to/borama/series/4701) by [Matouš Borák](https://dev.to/borama) written for [NejŘemeslníci](https://dev.to/nejremeslnici).
-So make sure to check the original articles and his links:
+So make sure to check the original articles and author's links:
 - [github](https://github.com/borama)
 - [twitter](https://twitter.com/boramacz)
 
