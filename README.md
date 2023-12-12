@@ -1,5 +1,5 @@
 # Why?
-This guide is made to ease process of setting automation of archiving a mysql database managed by DigitalOcean.
+This guide is made to ease the process of setting an automation script of archiving a mysql database managed by DigitalOcean.
 
 # Disclaimer and credits
 This guide heavily depends and almost copies [series of articles](https://dev.to/borama/series/4701) by [Matouš Borák](https://dev.to/borama) written for [NejŘemeslníci](https://dev.to/nejremeslnici).
