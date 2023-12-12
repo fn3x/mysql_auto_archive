@@ -1,0 +1,12 @@
+# Configuration for tables auto-archival.
+#
+# Format:
+# table_name interval keep
+#  - table_name = the name of the table to be archived (must be already partitioned)
+#  - interval   = yearly | monthly | weekly
+#  - keep       = number - how many partitions (besides the "future" partition) to keep
+
+my_huge_table monthly 12
+less_relevant_huge_table monthly 6
+quickly_growing_table weekly 12
+slowly_growing_table yearly 1
