@@ -20,22 +20,20 @@ We will create first partitions for the table manually. That will ease the proce
 That will be achieved with automatically creating strings for query using nodejs cli tools.
 
 ## Generate initial partition strings for query
-0. ```node```
-1. Replace 'from' with your actual start date ```const fromDate = new Date('from');```
-2. Replace 'to' with your actual end date ```const toDate = new Date('to');```
-3. ```for (let date = new Date(fromDate); date < toDate; date.setDate(date.getDate() + 1)) {
-  \ if (date.getDate() === 1) {
-  \      const nextMonth = new Date(date);
-  \      nextMonth.setMonth(date.getMonth() + 1);
-  \
-  \       const formattedDate = date.toISOString().split('T')[0];
-  \      const nextMonthFormatted = nextMonth.toISOString().split('T')[0];
-  \
-  \      console.log(`PARTITION ${date.getMonth() + 1}${date.getFullYear()} VALUES LESS THAN (TO_DAYS('${nextMonthFormatted}')),`);
-  \}
-\}```
-4. Copy the output
-5. Exit the nodejs cli with CTRL+D
+0. Run in the terminal the following command to enter node cli.
+```
+node
+```
+1. Replace 'from' and 'to' with your actual start and end date:
+```
+const fromDate = new Date('from');const toDate = new Date('to');
+```
+Then run this line:
+```
+for (let date = new Date(fromDate); date < toDate; date.setDate(date.getDate() + 1)) {if (date.getDate() === 1) {const nextMonth = new Date(date);nextMonth.setMonth(date.getMonth() + 1);const formattedMonth = ('0' + (date.getMonth() + 1)).slice(-2);const formattedYear = date.getFullYear();const formattedDate = `${formattedMonth}${formattedYear}`;const nextMonthFormatted = nextMonth.toISOString().split('T')[0];console.log(`PARTITION ${formattedDate} VALUES LESS THAN (TO_DAYS('${nextMonthFormatted}')),`);}}
+```
+2. Copy the output
+3. Exit the nodejs cli with CTRL+D
 
 ## Add temporary unique primary key
 Unfortunately, gh-ost does not support directly restructuring the primary key.
@@ -51,7 +49,9 @@ This is why, in effect, we need two separate migrations to partition each of our
 ## Create partitions with gh-ost
 Replace {__PASTE_HERE__} with the output generated on previous stage:
 
-```./utils/run_ghost.sh TABLE_NAME "DROP PRIMARY KEY, DROP KEY temp_pk, ADD PRIMARY KEY (id, requestTime) PARTITION BY RANGE(TO_DAYS(requestTime)) ({__PASTE_HERE__} PARTITION future VALUES LESS THAN (MAXVALUE))" --execute```
+```
+./utils/run_ghost.sh TABLE_NAME "DROP PRIMARY KEY, DROP KEY temp_pk, ADD PRIMARY KEY (id, requestTime) PARTITION BY RANGE(TO_DAYS(requestTime)) ({__PASTE_HERE__} PARTITION future VALUES LESS THAN (MAXVALUE))" --execute
+```
 
 # II. Exporting old data from the table
 We are using DigitalOcean services for keeping a managed database.
@@ -65,13 +65,16 @@ SET MYSQL_USER_ALIAS=sample_alias
 A small shell script, manual-export.sh, will export data from the given table and partition name into a gzipped file.
 
 We need to run it for each month of the required year. So we can use bash for loop to do exactly that:
-
-```for m in 01 02 03 04 05 06 07 08 09 10 11 12; do ./manual-export.sh TABLE_NAME "m2021$m"; done```
+```
+for m in 01 02 03 04 05 06 07 08 09 10 11 12; do ./manual-export.sh TABLE_NAME "m2021$m"; done
+```
 
 In case something goes wrong, do not try to kill the process, instead use the ”panic button“ in the script, i.e. uncomment the exit line, save the file and the rest of the loop won't run.
 
 ## Restoring data from the archive
-```gunzip /archive/TABLE_NAME/TABLE_NAME_m202101.gz | mysql```
+```
+gunzip /archive/TABLE_NAME/TABLE_NAME_m202101.gz | mysql
+```
 
 # III. Automation
 
